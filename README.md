@@ -17,19 +17,18 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Unlike real-world recommenders that learn from listening behavior, this system scores songs by directly comparing audio features to what the user says they want. Every recommendation is fully explainable — traceable to specific feature matches — but the system cannot discover taste the user hasn't already described.
 
-Some prompts to answer:
+The catalog contains 18 songs across 15 genres and 13 moods, loaded from `data/songs.csv`. The user profile stores four fields: `genre`, `mood`, `target_energy`, and `likes_acoustic`. The default "Late Night Focus" profile is: lofi, focused, energy 0.40, acoustic preferred.
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+Each song is scored on a 0.0–7.0 point scale by summing five sub-scores: +2.0 for a genre match, +1.5 for a mood match, up to +2.0 for energy proximity via `2.0 × (1 - (song.energy - target)²)`, up to +1.0 for acoustic fit, and up to +0.5 for valence as a tiebreaker. Songs are then sorted by score and the top five returned.
 
-You can include a simple diagram or bullet list if helpful.
+Genre is weighted highest because it is the most structural signal — it constrains instrumentation, tempo, and production style all at once. Energy matches genre at +2.0 because it is continuous and scores every song, not just lucky categorical matches. Mood sits at +1.5 since it captures the use-case intent but is less constraining than genre alone.
+
+A few biases are expected. The genre match gives a structural head start to the one or two songs that happen to match, which numeric features alone cannot overcome. Songs with no genre or mood match cluster in a narrow score band where ordering is semi-arbitrary. The valence tiebreaker silently favors brighter songs the user never asked for. And the boolean `likes_acoustic` is too blunt — it cannot express a preference for moderately acoustic over fully acoustic.
 
 ---
+![terminal screenshot](terminal_screenshot.png) 
 
 ## Getting Started
 
