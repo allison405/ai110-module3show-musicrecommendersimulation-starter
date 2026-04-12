@@ -29,6 +29,7 @@ A few biases are expected. The genre match gives a structural head start to the 
 
 ---
 ![terminal screenshot](terminal_screenshot.png) 
+---
 
 ## Getting Started
 
