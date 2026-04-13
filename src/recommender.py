@@ -67,22 +67,28 @@ def load_songs(csv_path: str) -> List[Dict]:
     return songs
 
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
-    """Score one song against user preferences (max 7.0) and return (score, reasons)."""
+    """Score one song against user preferences (max 8.0) and return (score, reasons).
+
+    Max breakdown: genre +1.0, mood +1.5, energy +4.0, acoustic +1.0, valence +0.5 = 8.0
+    """
     score = 0.0
     reasons = []
 
-    # Genre match — binary, +2.0
+    # Genre match — binary, +1.0
     if song["genre"] == user_prefs["genre"]:
-        score += 2.0
-        reasons.append(f"genre match (+2.0)")
+        score += 1.0
+        reasons.append(f"genre match (+1.0)")
 
     # Mood match — binary, +1.5
     if song["mood"] == user_prefs["mood"]:
         score += 1.5
         reasons.append(f"mood match (+1.5)")
 
-    # Energy proximity — quadratic, up to +2.0
-    energy_points = 2.0 * (1.0 - (song["energy"] - user_prefs["target_energy"]) ** 2)
+    # Energy proximity — quadratic, up to +4.0.
+    # Bounds proof: both song["energy"] and target_energy are in [0, 1], so their
+    # difference is in [-1, 1] and its square is in [0, 1].  Therefore
+    # (1.0 - diff²) is in [0, 1] and 4.0 * (1.0 - diff²) is in [0.0, 4.0]. ✓
+    energy_points = 4.0 * (1.0 - (song["energy"] - user_prefs["target_energy"]) ** 2)
     score += energy_points
     reasons.append(f"energy proximity (+{energy_points:.2f})")
 
